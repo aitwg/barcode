@@ -4,25 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barcode Generator</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f5;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357abd;
+        }
+        #barcode {
+            margin-top: 20px;
+            text-align: center;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>Online Barcode Generator</h1>
-    <input type="text" id="barcodeValue" placeholder="Enter text to generate barcode">
-    <button onclick="generateBarcode()">Generate Barcode</button>
-    <br>
-    <svg id="barcode"></svg>
+    <div class="container">
+        <h1>Barcode Generator</h1>
+        <input type="text" id="barcodeInput" placeholder="Enter text for barcode">
+        <button onclick="generateBarcode()">Generate Barcode</button>
+        <div id="barcode"></div>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     <script>
         function generateBarcode() {
-            var value = document.getElementById('barcodeValue').value;
-            JsBarcode("#barcode", value, {
-                format: "CODE128",
-                lineColor: "#0aa",
-                width: 2,
-                height: 100,
-                displayValue: true
-            });
+            const input = document.getElementById('barcodeInput').value;
+            const barcodeDiv = document.getElementById('barcode');
+            barcodeDiv.innerHTML = ''; // Clear any existing barcode
+
+            if (input.trim() !== '') {
+                const canvas = document.createElement('canvas');
+                JsBarcode(canvas, input, {
+                    format: "CODE128",
+                    displayValue: true,
+                    lineColor: "#000",
+                    width: 2,
+                    height: 100
+                });
+                barcodeDiv.appendChild(canvas);
+            } else {
+                alert("Please enter some text to generate the barcode.");
+            }
         }
     </script>
 </body>
