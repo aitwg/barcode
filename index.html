@@ -45,6 +45,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-bottom: 10px;
         }
         button:hover {
             background-color: #357abd;
@@ -64,29 +65,52 @@
         <h1>Barcode Generator</h1>
         <input type="text" id="barcodeInput" placeholder="Enter text for barcode">
         <button onclick="generateBarcode()">Generate Barcode</button>
-        <div id="barcode"></div>
+        <br>
+        <svg id="barcode"></svg>
+        <br>
+        <button onclick="downloadBarcode()">Download Barcode</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     <script>
         function generateBarcode() {
-            const input = document.getElementById('barcodeInput').value;
-            const barcodeDiv = document.getElementById('barcode');
-            barcodeDiv.innerHTML = ''; // Clear any existing barcode
+            var input = document.getElementById('barcodeInput').value;
+            JsBarcode("#barcode", input);
+        }
 
-            if (input.trim() !== '') {
-                const canvas = document.createElement('canvas');
-                JsBarcode(canvas, input, {
-                    format: "CODE128",
-                    displayValue: true,
-                    lineColor: "#000",
-                    width: 2,
-                    height: 100
+        function copyToClipboard() {
+            var svg = document.getElementById('barcode');
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var svgData = new XMLSerializer().serializeToString(svg);
+            var img = new Image();
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob(function(blob) {
+                    var item = new ClipboardItem({ "image/png": blob });
+                    navigator.clipboard.write([item]).then(function() {
+                        alert('Barcode copied to clipboard as image!');
+                    }, function(err) {
+                        console.error('Could not copy image: ', err);
+                    });
                 });
-                barcodeDiv.appendChild(canvas);
-            } else {
-                alert("Please enter some text to generate the barcode.");
-            }
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        }
+
+        function downloadBarcode() {
+            var svg = document.getElementById('barcode');
+            var svgData = new XMLSerializer().serializeToString(svg);
+            var svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            var svgUrl = URL.createObjectURL(svgBlob);
+            var downloadLink = document.createElement('a');
+            downloadLink.href = svgUrl;
+            downloadLink.download = 'barcode.svg';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
         }
     </script>
 </body>
